@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualBasic;
+﻿using Orders.Model;
 
-namespace Orders.Model
+namespace Orders.DTO
 {
-    public class Order
+    public class OrderDto 
     {
         public int Id { get; set; }
 
@@ -10,7 +10,6 @@ namespace Orders.Model
 
         public bool OrderProcessed { get; set; }
 
-        public IEnumerable <Item> Items { get; set; }
+        public IEnumerable<ItemDto> Items { get; set; }
     }
-
 }

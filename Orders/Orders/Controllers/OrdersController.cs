@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Orders.DTO;
+using Orders.Model;
+using Orders.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,36 +11,76 @@ namespace Orders.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
+        private readonly IOrderService _service;
+
         // GET: api/<OrdersController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult GetAll()
         {
-            return new string[] { "value1", "value2" };
+            var orders = _service.GetAllOrder();
+            if (orders.Any())
+                return Ok(orders);
+            else
+                return NoContent();
         }
 
         // GET api/<OrdersController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public IActionResult Get(int id)
         {
-            return "value";
+            var desiredOrder = _service.GetOrder(id);
+
+            if (desiredOrder != null)
+                return Ok(desiredOrder);
+            else
+                return NotFound();
         }
 
         // POST api/<OrdersController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] CreateOrderDto order)
         {
+            if (order == null)
+                return BadRequest();
+
+            _service.AddOrder(order);
+
+            return Ok(order);
         }
 
         // PUT api/<OrdersController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult Put(int id, [FromBody] OrderDto order)
         {
+            if (order == null)
+                return BadRequest();
+
+            var updatedOrCreatedOwner = _service.Update(order);
+
+            return Ok(updatedOrCreatedOwner);
+
         }
 
         // DELETE api/<OrdersController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            try
+            {
+                _service.Delete(id);
+            }
+            catch (Exception e)
+            {
+
+                return NotFound(e.Message);
+            }
+
+            return NoContent();
         }
+        public OrdersController(IOrderService service)
+        {
+            _service = service;
+        }
+
     }
 }
